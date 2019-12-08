@@ -35,9 +35,4 @@ export default {
 <style lang="scss">
 @import './assets/reset.scss';
 
-.navbar-link{
-  display: block;
-  height: 10px;
-  width: 100px;
-}
 </style>
