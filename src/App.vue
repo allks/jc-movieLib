@@ -4,7 +4,7 @@
       .navbar
         .container
           .navbar-content
-            router-link.header-logo(to="/") MovieLib
+            router-link.header-logo(to="/")
             .button-burger(
               @click="menuShow = !menuShow"
             )
