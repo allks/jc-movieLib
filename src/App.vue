@@ -1,6 +1,6 @@
 <template lang="pug">
   .wrapper
-    header
+    header.header
       .navbar
         .container
           .navbar-content
@@ -39,6 +39,19 @@ export default {
 </script>
 
 <style lang="scss">
-@import './assets/reset.scss';
+@import './assets/styles/common/reset.scss';
+
+.header{
+  border-bottom: 1px solid #3d3d3d;
+  height: 100px;
+}
+
+.navbar-content{
+  display: flex;
+}
+
+.navbar-list{
+  display: flex;
+}
 
 </style>
