@@ -19,19 +19,19 @@
           )
         .option-list
           input.what-watch(
+            v-model="whatWatch"
             type="radio"
             id="radioFilm"
             value="Фильм"
-            v-model="whatWatch"
           )
           label(
             for="radioFilm"
           ) Фильм
           input.what-watch(
+            v-model="whatWatch"
             type="radio"
             id="radioSerial"
             value="Сериал"
-            v-model="whatWatch"
           )
           label(
             for="radioSerial"
@@ -40,36 +40,48 @@
           .total-time__film(
             v-if="whatWatch === 'Фильм'"
           )
-            span Total Film Times
+            span.time-title Часа
+            input.time-input(
+              v-model="filmHours"
+              type="number"
+            )
+            span.time-title Минут
+            input.time-input(
+              v-model="filmMinutes"
+              type="number"
+            )
+            p {{ filmTime }}
           .totla-time__serial(
             v-if="whatWatch === 'Сериал'"
           )
-            span Total Serial Times
+            span.time-title Сколько сезонов?
+            input.time-input(
+              v-model="serialSeason"
+              type="number"
+            )
+            span.time-title Сколько серий?
+            input.time-input(
+              v-model="serialSeries"
+              type="number"
+            )
+            span.time-title Какой продолжительности серия? (минут)
+            input.time-input(
+              v-model="serialSeriesMinutes"
+              type="number"
+            )
+            p {{ serialTime }}
         .tag-list
-          .tag
-            span.tag-title TAG
-            span.btn-close &times;
-    section
-      .container
-        .task-list
-          .task-item(
-            v-for="task in tasks"
-            :key="task.id"
-            :class="{ completed: task.completed }"
+          .tag-wrapper(
+            v-for="tag in tags"
+            :key="tag.title"
           )
-            .task-item__info
-              span.task-item__label {{ task.whatWatch }}
-              span.task-item__time Total Time:
-              span.task-item__remove удалить
-            .task-item__content
-              .task-item__header
-                input.task-item__checkbox(
-                  type="checkbox"
-                  v-model="task.completed"
-                )
-                span.task-item__title {{ task.title }}
-              .task-item__body
-                p.task-item__description {{ task.description }}
+            .tag(
+              @click="addTagUsed(tag)"
+              :class="{active: tag.use}"
+            )
+              span.tag-title {{ tag.title }}
+              span.btn-close &times;
+            p {{ tagsUsed }}
 </template>
 
 <script>
@@ -80,22 +92,27 @@ export default {
       taskDescription: '',
       taskId: 3,
       whatWatch: 'Фильм',
-      tasks: [
+      // Total Time
+      // Film
+      filmHours: 1,
+      filmMinutes: 30,
+      // Serial
+      serialSeason: 1,
+      serialSeries: 11,
+      serialSeriesMinutes: 40,
+      tagsUsed: [],
+      tags: [
         {
-          id: 1,
-          title: 'Ex nostrud exercitation voluptate nulla ullamco amet exercitation consectetur ut.',
-          description: 'Aliquip pariatur voluptate aute sunt sit velit enim. Tempor ex mollit laborum duis esse elit et minim occaecat ut consectetur ea exercitation. Laborum culpa et anim eiusmod in ex commodo deserunt exercitation. Ex culpa voluptate proident enim cupidatat eiusmod eiusmod enim ex magna eu et sint magna.',
-          whatWatch: 'Фильм',
-          completed: false,
-          editing: false,
+          title: 'Комедия',
+          use: false,
         },
         {
-          id: 2,
-          title: 'Excepteur quis eu sint cupidatat ut commodo ut Lorem dolore.',
-          description: 'Amet est duis do ut aliquip exercitation amet enim non ullamco cupidatat aliqua minim sint. Aliquip et labore dolor labore in anim aute aliquip irure ut. Anim sit cupidatat exercitation non eu minim nostrud enim in officia ut aute. Aute enim aute in magna anim aliquip aliquip anim elit voluptate laborum. Consectetur laborum sint anim ullamco anim. Minim mollit reprehenderit sit veniam amet sit sit. Nisi nostrud magna aliquip labore cillum.',
-          whatWatch: 'Сериал',
-          completed: false,
-          editing: false,
+          title: 'Ужасы',
+          use: false,
+        },
+        {
+          title: 'Приключения',
+          use: false,
         },
       ],
     };
@@ -105,17 +122,50 @@ export default {
       if (this.taskTitle === '') {
         return;
       }
-      this.tasks.push({
+      let time;
+      if (this.whatWatch === 'Фильм') {
+        time = this.filmTime;
+      } else {
+        time = this.serialTime;
+      }
+      const task = {
         id: this.taskId,
         title: this.taskTitle,
         description: this.taskDescription,
         whatWatch: this.whatWatch,
+        time,
         completed: false,
         editing: false,
-      });
+      };
+      console.log(task);
       this.taskId += 1;
       this.taskTitle = '';
       this.taskDescription = '';
+    },
+    addTagUsed(tag) {
+      tag.use = !tag.use;
+      if (tag.use) {
+        this.tagsUsed.push(
+          tag.title,
+        );
+      } else {
+        this.tagsUsed.splice(tag.title, 1);
+      }
+    },
+    getHoursAndMinutes(minutes) {
+      const hours = Math.trunc(minutes / 60);
+      const min = minutes % 60;
+      return `${hours} Ч. ${min} Мин.`;
+    },
+  },
+  computed: {
+    filmTime() {
+      const min = (this.filmHours * 60) + (this.filmMinutes * 1);
+      return this.getHoursAndMinutes(min);
+    },
+    serialTime() {
+      const min = this.serialSeason * this.serialSeries * this.serialSeriesMinutes;
+      return this.getHoursAndMinutes(min);
     },
   },
 };
@@ -149,59 +199,6 @@ export default {
   resize: none;
 }
 
-.task-list{
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.task-item{
-  border: 1px solid #ccc;
-  margin: 20px;
-  padding: 10px;
-  border-radius: 5px;
-  width: 650px;
-  &__info{
-    display: flex;
-  }
-  &__label{
-    background-color: #ccc;
-    display: inline-block;
-    min-width: 70px;
-    height: 30px;
-    border-radius: 5px;
-    margin: 5px;
-    padding: 0 5px;
-    line-height: 30px;
-    text-align: center;
-  }
-  &__time{
-    line-height: 40px;
-  }
-  &__remove{
-    margin: 10px;
-    margin-left: auto;
-    background-color: #b7504c;
-    width: 70px;
-    height: 25px;
-    border-radius: 5px;
-    text-align: center;
-    line-height: 25px;
-    font-size: 12px;
-    color: #fff;
-    cursor: pointer;
-    &:hover{
-      background-color: darken(#b7504c, 7);
-    }
-  }
-  &__header{
-    margin-bottom: 10px;
-  }
-  &__body{
-    margin-left: 20px;
-  }
-}
-
 .option-list,
 .total-time,
 .tag-list{
@@ -214,6 +211,7 @@ export default {
   border: 1px solid #ccc;
   border-radius: 5px;
   padding: 5px;
+  margin: 5px;
   height: 20px;
   line-height: 20px;
 }
@@ -227,6 +225,9 @@ export default {
   text-align: center;
   color: #fff;
   margin-left: 10px;
-  font-size: px;
+  cursor: pointer;
+  &:hover{
+    background-color: darken(#b7504c, 7);
+  }
 }
 </style>
