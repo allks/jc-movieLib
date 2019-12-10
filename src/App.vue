@@ -4,7 +4,7 @@
       .navbar
         .container
           .navbar-content
-            router-link.header-logo(to="/")
+            router-link.header-logo(to="/") MovieLib
             .button-burger(
               @click="menuShow = !menuShow"
             )
@@ -41,17 +41,36 @@ export default {
 <style lang="scss">
 @import './assets/styles/common/reset.scss';
 
+body{
+  font-family: Arial, serif;
+}
+
 .header{
   border-bottom: 1px solid #3d3d3d;
-  height: 100px;
 }
 
 .navbar-content{
   display: flex;
+  height: 60px;
+  justify-content: space-between;
+}
+
+.header-logo{
+  width: 250px;
+  line-height: 60px;
+  text-align: center;
+  text-decoration: none;
+  font-size: 25px;
 }
 
 .navbar-list{
   display: flex;
+  height: 60px;
+  line-height: 60px;
+}
+
+.navbar-item{
+  margin: 0 20px;
 }
 
 </style>
