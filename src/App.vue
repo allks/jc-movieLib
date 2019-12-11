@@ -29,10 +29,10 @@ export default {
     return {
       menuShow: false,
       linkMenu: [
-        { title: 'Home', url: '/' },
-        { title: 'Tasks', url: '/task' },
-        { title: 'Login', url: '/login' },
-        { title: 'Registration', url: '/registration' },
+        { title: 'Главная', url: '/' },
+        { title: 'Список просмотра', url: '/task' },
+        { title: 'Логин', url: '/login' },
+        { title: 'Регистрация', url: '/registration' },
       ],
     };
   },

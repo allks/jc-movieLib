@@ -50,7 +50,6 @@
               v-model="filmMinutes"
               type="number"
             )
-            p {{ filmTime }}
           .totla-time__serial(
             v-if="whatWatch === 'Сериал'"
           )
@@ -69,7 +68,6 @@
               v-model="serialSeriesMinutes"
               type="number"
             )
-            p {{ serialTime }}
         .tag-list
           .tag-wrapper(
             @click="tagMenuShow = !tagMenuShow"
@@ -102,7 +100,6 @@
             )
               span.tag-title {{ tag.title }}
               span.btn-close &times;
-          p {{ tagsUsed }}
         .btn.btn-send(
           @click="newTask"
         ) Отправить
@@ -114,7 +111,6 @@ export default {
     return {
       taskTitle: '',
       taskDescription: '',
-      taskId: 3,
       whatWatch: 'Фильм',
       // Total Time
       // Film
@@ -128,20 +124,6 @@ export default {
       tagTitle: '',
       tagMenuShow: false,
       tagsUsed: [],
-      tags: [
-        {
-          title: 'Комедия',
-          use: false,
-        },
-        {
-          title: 'Ужасы',
-          use: false,
-        },
-        {
-          title: 'Приключения',
-          use: false,
-        },
-      ],
     };
   },
   methods: {
@@ -149,13 +131,11 @@ export default {
       if (this.tagTitle === '') {
         return;
       }
-      this.tags.push({
+      const tag = {
         title: this.tagTitle,
-        used: false,
-      });
-      // const tag = {
-      //   title: this.tagTitle,
-      // }
+        use: false,
+      };
+      this.$store.dispatch('newTag', tag);
     },
     newTask() {
       if (this.taskTitle === '') {
@@ -168,27 +148,29 @@ export default {
         time = this.serialTime;
       }
       const task = {
-        id: this.taskId,
         title: this.taskTitle,
         description: this.taskDescription,
         whatWatch: this.whatWatch,
         time,
-        tagsUsed: this.tagsUsed,
+        tags: this.tagsUsed,
         completed: false,
         editing: false,
       };
+      this.$store.dispatch('newTask', task);
       console.log(task);
-      this.taskId += 1;
       this.taskTitle = '';
       this.taskDescription = '';
       this.tagsUsed = [];
+      for (let i = 0; i < this.tags.length; i++) {
+        this.tags[i].use = false;
+      }
     },
     addTagUsed(tag) {
       tag.use = !tag.use; // eslint-disable-line no-param-reassign
       if (tag.use) {
-        this.tagsUsed.push(
-          tag.title,
-        );
+        this.tagsUsed.push({
+          title: tag.title,
+        });
       } else {
         this.tagsUsed.splice(tag.title, 1);
       }
@@ -200,6 +182,9 @@ export default {
     },
   },
   computed: {
+    tags() {
+      return this.$store.getters.tags;
+    },
     filmTime() {
       const min = (this.filmHours * 60) + (this.filmMinutes * 1);
       return this.getHoursAndMinutes(min);
@@ -255,6 +240,9 @@ export default {
   margin: 5px;
   height: 20px;
   line-height: 20px;
+  &.active{
+    background-color: #ccc;
+  }
 }
 
 .tag-add{

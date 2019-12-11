@@ -3,14 +3,25 @@
     section
       .container
         .task-list
+          .filter
+            .btn(
+              @click="filter = 'active'"
+            ) В процессе
+            .btn(
+              @click="filter = 'completed'"
+            ) Просмотрено
+            .btn(
+              @click="filter = 'all'"
+            ) Все
+        .task-list
           .task-item(
-            v-for="task in tasks"
+            v-for="task in tasksFilter"
             :key="task.id"
             :class="{ completed: task.completed }"
           )
             .task-item__info
               span.task-item__label {{ task.whatWatch }}
-              span.task-item__time Total Time:
+              span.task-item__time Общее время: {{ task.time }}
               span.task-item__remove удалить
             .task-item__content
               .task-item__header
@@ -21,41 +32,77 @@
                 span.task-item__title {{ task.title }}
               .task-item__body
                 p.task-item__description {{ task.description }}
+              .task-item__footer
+                .tag-list
+                  .tag-wrapper(
+                    v-for="tag in task.tags"
+                    :key="tag.title"
+                  )
+                    .tag
+                      span.tag-title {{ tag.title }}
 </template>
 
 <script>
 export default {
   data() {
     return {
-      tasks: [
-        {
-          id: 1,
-          title: 'Ex nostrud exercitation voluptate nulla ullamco amet exercitation consectetur ut.',
-          description: 'Aliquip pariatur voluptate aute sunt sit velit enim. Tempor ex mollit laborum duis esse elit et minim occaecat ut consectetur ea exercitation. Laborum culpa et anim eiusmod in ex commodo deserunt exercitation. Ex culpa voluptate proident enim cupidatat eiusmod eiusmod enim ex magna eu et sint magna.',
-          whatWatch: 'Фильм',
-          completed: false,
-          editing: false,
-        },
-        {
-          id: 2,
-          title: 'Excepteur quis eu sint cupidatat ut commodo ut Lorem dolore.',
-          description: 'Amet est duis do ut aliquip exercitation amet enim non ullamco cupidatat aliqua minim sint. Aliquip et labore dolor labore in anim aute aliquip irure ut. Anim sit cupidatat exercitation non eu minim nostrud enim in officia ut aute. Aute enim aute in magna anim aliquip aliquip anim elit voluptate laborum. Consectetur laborum sint anim ullamco anim. Minim mollit reprehenderit sit veniam amet sit sit. Nisi nostrud magna aliquip labore cillum.',
-          whatWatch: 'Сериал',
-          completed: false,
-          editing: false,
-        },
-      ],
+      filter: 'active',
     };
+  },
+  computed: {
+    tasksFilter() {
+      if (this.filter === 'active') {
+        return this.$store.getters.taskNotCompleted;
+      } if (this.filter === 'completed') {
+        return this.$store.getters.taskCompleted;
+      } if (this.filter === 'all') {
+        return this.$store.getters.tasks;
+      }
+      return this.filter === 'active';
+    },
+    tasks() {
+      return this.$store.getters.tasks;
+    },
   },
 };
 </script>
 
 <style lang="scss" scoped>
+.filter{
+  display: flex;
+}
+
+.btn{
+  width: 130px;
+  height: 20px;
+  border: 1px solid #ccc;
+  text-align: center;
+  line-height: 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin: 10px;
+}
+
 .task-list{
   display: flex;
   flex-direction: column;
   align-items: center;
 }
+
+.tag-list{
+  display: flex;
+  margin-bottom: 20px;
+}
+
+.tag{
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 5px;
+  margin: 5px;
+  height: 20px;
+  line-height: 20px;
+}
+
 .task-item{
   border: 1px solid #ccc;
   margin: 20px;
@@ -100,6 +147,14 @@ export default {
   }
   &__body{
     margin-left: 20px;
+  }
+  &.completed{
+    .task-item__title,
+    .task-item__description,
+    .tag{
+      text-decoration: line-through;
+      color: #ccc;
+    }
   }
 }
 </style>
