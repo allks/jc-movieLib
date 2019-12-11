@@ -2,7 +2,6 @@
   .content-wrapper
     section
       .container
-        h1 Tasks
         .task-list
           .task-item(
             v-for="task in tasks"

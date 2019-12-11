@@ -72,6 +72,27 @@
             p {{ serialTime }}
         .tag-list
           .tag-wrapper(
+            @click="tagMenuShow = !tagMenuShow"
+          )
+            .tag
+              span.tag-title Добавить тег
+              span.btn-close(
+                :class="{ active: !tagMenuShow }"
+              ) &times;
+        .tag-list(
+          v-if="tagMenuShow"
+        )
+          input.tag-add(
+            v-model="tagTitle"
+            type="text"
+            placeholder="Новый тег"
+            @keyup.enter="newTag"
+          )
+          .btn.btn-add(
+            @click="newTag"
+          ) Добавить
+        .tag-list
+          .tag-wrapper(
             v-for="tag in tags"
             :key="tag.title"
           )
@@ -81,7 +102,10 @@
             )
               span.tag-title {{ tag.title }}
               span.btn-close &times;
-            p {{ tagsUsed }}
+          p {{ tagsUsed }}
+        .btn.btn-send(
+          @click="newTask"
+        ) Отправить
 </template>
 
 <script>
@@ -100,6 +124,9 @@ export default {
       serialSeason: 1,
       serialSeries: 11,
       serialSeriesMinutes: 40,
+      // Tags
+      tagTitle: '',
+      tagMenuShow: false,
       tagsUsed: [],
       tags: [
         {
@@ -118,6 +145,18 @@ export default {
     };
   },
   methods: {
+    newTag() {
+      if (this.tagTitle === '') {
+        return;
+      }
+      this.tags.push({
+        title: this.tagTitle,
+        used: false,
+      });
+      // const tag = {
+      //   title: this.tagTitle,
+      // }
+    },
     newTask() {
       if (this.taskTitle === '') {
         return;
@@ -134,6 +173,7 @@ export default {
         description: this.taskDescription,
         whatWatch: this.whatWatch,
         time,
+        tagsUsed: this.tagsUsed,
         completed: false,
         editing: false,
       };
@@ -141,9 +181,10 @@ export default {
       this.taskId += 1;
       this.taskTitle = '';
       this.taskDescription = '';
+      this.tagsUsed = [];
     },
     addTagUsed(tag) {
-      tag.use = !tag.use;
+      tag.use = !tag.use; // eslint-disable-line no-param-reassign
       if (tag.use) {
         this.tagsUsed.push(
           tag.title,
@@ -216,6 +257,36 @@ export default {
   line-height: 20px;
 }
 
+.tag-add{
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 5px;
+  width: 200px;
+}
+
+.btn{
+  width: 160px;
+  height: 30px;
+  border: 1px solid #ccc;
+  text-align: center;
+  line-height: 30px;
+  border-radius: 5px;
+  margin: 0 20px;
+  cursor: pointer;
+  &-add{
+    background-color: #ccc;
+    color: #fff;
+  }
+  &-send{
+    margin-left: auto;
+    background-color: #50c878;
+    color: #fff;
+    &:hover{
+      background-color: darken(#50c878, 7);
+    }
+  }
+}
+
 .btn-close{
   display: inline-block;
   background-color: #b7504c;
@@ -226,8 +297,12 @@ export default {
   color: #fff;
   margin-left: 10px;
   cursor: pointer;
+  transition: .2s;
   &:hover{
     background-color: darken(#b7504c, 7);
+  }
+  &.active{
+    transform: rotate(45deg)
   }
 }
 </style>
